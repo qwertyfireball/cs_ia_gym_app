@@ -110,6 +110,9 @@ class ProcessedVideoTrack(MediaStreamTrack): # class allows store incoming track
             # squat(result)
             lateral_raise(result)
             self.mp_drawing.draw_landmarks(img, result.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
+            cv2.putText(
+                img, f"Reps: {counter}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX | cv2.FONT_ITALIC, 1, (255, 255, 255), 1.5
+            )
             print("drawn landmarks")
 
         new_frame = VideoFrame.from_ndarray(img, format = "bgr24")
@@ -140,12 +143,17 @@ async def echoserver(websocket): # server
     async def trickle_ice(event):
         if event.candidate is not None:
             await websocket.send(json.dumps({
-       'type': 'candidate',
-          'candidate': {
-            'candidate': candidate_to_sdp(event.candidate),
-            'sdpMid': event.candidate.sdpMid, 
-            'sdpMLineIndex': event.candidate.sdpMLineIndex, 
+                'type': 'candidate',
+                'candidate': {
+                'candidate': candidate_to_sdp(event.candidate),
+                'sdpMid': event.candidate.sdpMid, 
+                'sdpMLineIndex': event.candidate.sdpMLineIndex, 
             }}))
+
+            await websocket.send(json.dumps({
+                'type': 'rep_count'
+                'value': counter
+            }))
 
     try:
         async for rawJSON in websocket:

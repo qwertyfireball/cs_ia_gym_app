@@ -24,6 +24,8 @@ MediaStream? localmediaStream;
 final pendingRemoteCandidate = <RTCIceCandidate> []; //for incoming ice candidates that come too early
 bool remotedescr = false; // a gate for whether or not flutter recieved/applied python's response
 
+int ? reps;
+
 class _RepState extends State<Rep> {
   @override
   void initState() {
@@ -136,6 +138,11 @@ class _RepState extends State<Rep> {
           pendingRemoteCandidate.add(ice);
         }
       }
+
+      if (message['type'] == 'rep_count') {
+        final reps = message['value'];
+        print(reps);
+      };
     });
   }
 

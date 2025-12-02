@@ -81,7 +81,7 @@ class _HistoryState extends State<History> {
                 },
                 child: Text("add a date")),
             Expanded(
-                child: ListView.builder(
+              child: ListView.builder(
               itemCount: workout_history.length,
               itemBuilder: (context, index) {
                 return Card(

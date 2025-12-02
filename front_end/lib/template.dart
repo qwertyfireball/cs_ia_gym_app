@@ -1,5 +1,5 @@
+import 'package:cs_ia_gym_app/chest_edit.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Template extends StatefulWidget {
   const Template({super.key});
@@ -8,35 +8,7 @@ class Template extends StatefulWidget {
   State<Template> createState() => _TemplateState();
 }
 
-  class Sets {
-    double ? weight;
-    int ? reps;
-    Sets({required this.weight, required this.reps});
-    Map<String, dynamic> toMap() => {'rep': reps, 'weight': weight};
-    factory Sets.fromMap(Map<String, dynamic> m) => Sets((weight: m['weight'] as num).toDouble(), reps: m['weight'] as num).toDouble()
-  }
-
-  class Excercise {
-
-  }
-
-  class Workout {
-
-  }
-
 class _TemplateState extends State<Template> {
-  Future<void> save_template() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("", )
-  }
-
-  Future<void> load_template() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.getString("") ?? {};
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +48,12 @@ class _TemplateState extends State<Template> {
             ),
             OutlinedButton(
                 onPressed: () {
-                  print("edit chest workout");
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (context) => ChestEdit()
+                    )
+                  );
                 },
                 style: OutlinedButton.styleFrom(
                     fixedSize: Size(325, 100),
@@ -92,16 +69,16 @@ class _TemplateState extends State<Template> {
                       height: 75,
                     ),
                     const SizedBox(width: 50),
-                    const Text(
-                      "- Chest Flys x 12 \n- Bench Press x 33 \n- Incline Press x 8",
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.white,
-                      ),
-                    )
+                    // const Text(
+                    //   "$",
+                    //   style: TextStyle(
+                    //     fontFamily: 'Roboto',
+                    //     fontSize: 15,
+                    //     fontWeight: FontWeight.w700,
+                    //     fontStyle: FontStyle.italic,
+                    //     color: Colors.white,
+                    //   ),
+                    // )
                   ],
                 )),
             const SizedBox(
@@ -109,7 +86,7 @@ class _TemplateState extends State<Template> {
             ),
             OutlinedButton(
                 onPressed: () {
-                  print("edit arm workout");
+                  
                 },
                 style: OutlinedButton.styleFrom(
                     fixedSize: Size(325, 100),
@@ -125,16 +102,16 @@ class _TemplateState extends State<Template> {
                       height: 75,
                     ),
                     const SizedBox(width: 50),
-                    const Text(
-                      "- Chest Flys x 12 \n- Bench Press x 33 \n- Incline Press x 8",
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.white,
-                      ),
-                    )
+                    // const Text(
+                    //   "$",
+                    //   style: TextStyle(
+                    //     fontFamily: 'Roboto',
+                    //     fontSize: 15,
+                    //     fontWeight: FontWeight.w700,
+                    //     fontStyle: FontStyle.italic,
+                    //     color: Colors.white,
+                    //   ),
+                    // )
                   ],
                 )),
             const SizedBox(
@@ -142,7 +119,7 @@ class _TemplateState extends State<Template> {
             ),
             OutlinedButton(
                 onPressed: () {
-                  print("edit leg workout");
+                 
                 },
                 style: OutlinedButton.styleFrom(
                     fixedSize: Size(325, 100),
@@ -158,39 +135,18 @@ class _TemplateState extends State<Template> {
                       height: 75,
                     ),
                     const SizedBox(width: 50),
-                    const Text(
-                      "- Chest Flys x 12 \n- Bench Press x 33 \n- Incline Press x 8",
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.white,
-                      ),
-                    )
+                    // const Text(
+                    //   "$",
+                    //   style: TextStyle(
+                    //     fontFamily: 'Roboto',
+                    //     fontSize: 15,
+                    //     fontWeight: FontWeight.w700,
+                    //     fontStyle: FontStyle.italic,
+                    //     color: Colors.white,
+                    //   ),
+                    // )
                   ],
                 )),
-            const SizedBox(height: 50,),
-            OutlinedButton(
-                onPressed: () {
-                  print('edit a new workout');
-                },
-                style: OutlinedButton.styleFrom(
-                    fixedSize: Size(275, 50),
-                    backgroundColor: Color(0xFF3A3E42),
-                    side: BorderSide(color: Color(0xFF715DC8), width: 3),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25))),
-                child: const Text(
-                  'Add a new workout!',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white,
-                  ),
-                ))
           ],
         ));
   }
