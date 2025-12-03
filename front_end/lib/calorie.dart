@@ -17,7 +17,7 @@ class _CalorieState extends State<Calorie> {
   late CameraController cameraController;
   late List<CameraDescription> cameras;
   bool cameraInitialized = false;
-  int ? salmon_count;
+  int? salmon_count;
 
   @override
   void initState() {
@@ -37,24 +37,37 @@ class _CalorieState extends State<Calorie> {
   Future<void> capture_send() async {
     XFile file = await cameraController.takePicture();
     File imageFile = File(file.path);
+    debugPrint("took picture + turned into file");
     await sendToPython(imageFile);
+    debugPrint("ran sendTopython");
   }
 
   Future<void> sendToPython(File imagefile) async {
-    final url = Uri.parse("http://192.168.50.172:9001/detect"); // parses the python server url
-    final request = http.MultipartRequest("POST", url).. files.add(await http.MultipartFile.fromPath("file", imagefile.path));//creates a post request (.. = apply this to the same object) 
-    final flutter_response = await request.send(); // sends request (opens socket + upload file + wait python response)
+    final url = Uri.parse(
+        "http://192.168.50.181:9001/detect"); // parses the python server url
+    final request = http.MultipartRequest("POST", url)
+      ..files.add(await http.MultipartFile.fromPath(
+          "file",
+          imagefile
+              .path)); //creates a post request (.. = apply this to the same object)
+    final flutter_response = await request
+        .send(); // sends request (opens socket + upload file + wait python response)
+    debugPrint("file sent");
     final python_response = await flutter_response.stream.bytesToString();
 
-    if (flutter_response.statusCode == 200) { //check if python got it, status code = 200 means got it
+    if (flutter_response.statusCode == 200) {
+      //check if python got it, status code = 200 means got it
       print("python got it");
       final decoded = jsonDecode(python_response);
       final obj_count = decoded['salmon_count'];
 
       setState(() {
-        obj_count == int ? salmon_count = obj_count : salmon_count = int.tryParse(obj_count.toString());
+        obj_count == int
+            ? salmon_count = obj_count
+            : salmon_count = int.tryParse(obj_count.toString());
       });
     }
+    debugPrint("salmon count: $salmon_count");
   }
 
   @override
@@ -162,11 +175,12 @@ class _CalorieState extends State<Calorie> {
                               cameraController,
                             ),
                           ),
-                          const SizedBox(height: 5,),
+                          const SizedBox(
+                            height: 5,
+                          ),
                           ElevatedButton(
                             onPressed: () {
                               capture_send();
-                             
                             },
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(5, 5),

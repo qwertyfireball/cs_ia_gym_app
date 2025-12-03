@@ -8,11 +8,13 @@ import asyncio
 
 server = FastAPI()
 model = YOLO("best.pt")
+print("model loaded")
 model.eval() #sets it to inference mode
 
 @server.post("/detect") #tells fastapi all http post will be handled by this function
 async def detect(file: UploadFile = File(...)): # file: python expects a file to be uploaded in the "file" field, UploadFile: fastapi's file handling class, File(...): the input parameter should be from a file upload
     img_bytes = await file.read()
+    print(f"{img_bytes}")
     img_PIL = Image.open(io.BytesIO(img_bytes)).convert("RGB") #rgb so YOLO can process
     # buffer = io.BytesIO() # bytesio creates an in-memory buffer -> stores processed image in memory so it can be returned
 

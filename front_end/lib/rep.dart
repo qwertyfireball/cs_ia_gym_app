@@ -21,21 +21,23 @@ final remoteRenderer = RTCVideoRenderer();
 RTCPeerConnection? peerConnection;
 MediaStream? localmediaStream;
 
-final pendingRemoteCandidate = <RTCIceCandidate> []; //for incoming ice candidates that come too early
-bool remotedescr = false; // a gate for whether or not flutter recieved/applied python's response
+final pendingRemoteCandidate =
+    <RTCIceCandidate>[]; //for incoming ice candidates that come too early
+bool remotedescr =
+    false; // a gate for whether or not flutter recieved/applied python's response
 
-int ? reps;
+int? reps;
 
 class _RepState extends State<Rep> {
   @override
   void initState() {
     super.initState();
     initRenderer();
-    channel = WebSocketChannel.connect(Uri.parse('ws://192.168.50.172:9001'));
+    channel = WebSocketChannel.connect(Uri.parse('ws://192.168.50.181:9001'));
     initCamera().then((_) => startWebRTC());
     print("connected uri");
-  } 
-  
+  }
+
   Future<void> initRenderer() async {
     await localRenderer.initialize();
     await remoteRenderer.initialize();
@@ -58,7 +60,12 @@ class _RepState extends State<Rep> {
     }
     await localRenderer.initialize();
     localmediaStream = await navigator.mediaDevices.getUserMedia({
-      'video': {'facingMode': 'user'},
+      'video': {
+        'facingMode': 'user',
+        'width': {'ideal': 640},
+        'height': {'ideal': 480},
+        'frameRate': {'ideal': 15},
+      },
       'audio': false,
     });
 
@@ -77,20 +84,20 @@ class _RepState extends State<Rep> {
 
     peerConnection =
         await createPeerConnection(config); //creates RTC connection
-    
+
     peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
       if (candidate.candidate != null) {
         channel.sink.add(jsonEncode({
           'type': 'candidate',
           'candidate': {
             'candidate': candidate.candidate,
-            'sdpMid': candidate.sdpMid, // media id (sdpMid = 0, 1, 2 -> audio, video, application)
+            'sdpMid': candidate
+                .sdpMid, // media id (sdpMid = 0, 1, 2 -> audio, video, application)
             'sdpMLineIndex': candidate.sdpMLineIndex, // index of media
           },
-        })
-        );
+        }));
       }
-    };// trickle ice
+    }; // trickle ice
 
     for (var i in localmediaStream!.getTracks()) {
       //getTracks get tracks from localmediaStream (line 47) / i represent each track in stream
@@ -101,7 +108,8 @@ class _RepState extends State<Rep> {
     peerConnection!.onTrack = (RTCTrackEvent e) {
       //get video back from python/ RTCTrackEvent: data obj includes (tracks, streams, transceivers)
       if (e.streams.isNotEmpty) {
-        setState(() => remoteRenderer.srcObject = e.streams[0]); // connects remote video to your flutter UI
+        setState(() => remoteRenderer.srcObject =
+            e.streams[0]); // connects remote video to your flutter UI
         print("processed video back");
       }
     };
@@ -126,23 +134,25 @@ class _RepState extends State<Rep> {
           await peerConnection!.addCandidate(c);
         }
         pendingRemoteCandidate.clear();
-      }
-   
-      else if (message['type'] == 'candidate') {
+      } else if (message['type'] == 'candidate') {
         final candidate = message['candidate'];
-        final ice = RTCIceCandidate(candidate['candidate'] as String, candidate['sdpMid'] as String?, candidate['sdpMLineIndex'] as int?);
+        final ice = RTCIceCandidate(
+            candidate['candidate'] as String,
+            candidate['sdpMid'] as String?,
+            (candidate['sdpMLineIndex'] as num?)?.toInt());
         if (remotedescr == true) {
           await peerConnection!.addCandidate(ice);
-        }
-        else {
+        } else {
           pendingRemoteCandidate.add(ice);
         }
       }
 
       if (message['type'] == 'rep_count') {
         final reps = message['value'];
+        print("recieved reps!");
         print(reps);
-      };
+      }
+      ;
     });
   }
 
@@ -202,14 +212,15 @@ class _RepState extends State<Rep> {
               color: Color(0xFF715DC8),
               strokeWidth: 2,
               child: localmediaStream != null
-                  ? SizedBox(
-                      width: 330,
-                      height: 265,
+                  ? AspectRatio(
+                      aspectRatio: 360 / 640,
                       child: RTCVideoView(
                         remoteRenderer,
                         mirror: true,
                         objectFit: RTCVideoViewObjectFit
                             .RTCVideoViewObjectFitCover, // entire image fit without cropping
+                        // objectFit:
+                        //     RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       ),
                     )
                   : Column(children: [

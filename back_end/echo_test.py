@@ -21,7 +21,7 @@ class ProcessedVideoTrack(MediaStreamTrack): # class allows store incoming track
         self.pose = mp.solutions.pose.Pose(min_detection_confidence = 0.5, min_tracking_confidence = 0.5)
         self.mp_pose = mp.solutions.pose
         self.mp_drawing = mp.solutions.drawing_utils
-        print("inited")
+
     
     async def recv(self) -> VideoFrame:
         frame = await self.source.recv()
@@ -99,26 +99,47 @@ class ProcessedVideoTrack(MediaStreamTrack): # class allows store incoming track
             if degree_L and degree_R > 80 and state == "down":
                 state = "up"
                 counter += 1
-                print(counter)
 
         img = frame.to_ndarray(format = "bgr24")
-        result = self.pose.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)) #pose.process only takes in numpy not framepy, which is why need: framepy -> numpy -> frampy (output)
 
-        if result.pose_landmarks:
+        pose_input = cv2.resize(img, (256, 256)) # downsizes img to make it less resolution and run faster
+        result = self.pose.process(cv2.cvtColor(pose_input, cv2.COLOR_BGR2RGB)) #pose.process only takes in numpy not framepy, which is why need: framepy -> numpy -> frampy (output)
+
+        if result.pose_landmarks is None:
+            print("no landmark is drawn, you about to fail chigga")
+        
+        else:
             # place functions here ->
             # bicep_curl(result)
             # squat(result)
             lateral_raise(result)
             self.mp_drawing.draw_landmarks(img, result.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
+
+            h, w, _ = img.shape # height, width, and color channel (which doesn't matter -> replaced with _)
+            text = f"Reps: {counter}"
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_size = 3.0
+            font_color = (255, 255, 255)
+            thickness = 2
+            anti_alias = cv2.LINE_AA
+
+            (text_w, text_h), baseline = cv2.getTextSize(text, font, font_size, thickness) #baseline is not needed here it just cv2.getTextSize requires this parameter
+            x = (w - text_w)//2 #centers it
+            y = int(h*0.15) + text_h # 15 % from the top
             cv2.putText(
-                img, f"Reps: {counter}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX | cv2.FONT_ITALIC, 1, (255, 255, 255), 1.5
+                img,
+                text,
+                (x, y),
+                font,
+                font_size,
+                font_color,
+                thickness,
+                anti_alias,
             )
-            print("drawn landmarks")
 
         new_frame = VideoFrame.from_ndarray(img, format = "bgr24")
         new_frame.pts = frame.pts # pts = when this frame should be shown
         new_frame.time_base = frame.time_base # conversion of pts to seconds
-        print("new frame about to be returned")
         return new_frame
     
 async def ice(peerConnection: RTCPeerConnection):
@@ -136,7 +157,7 @@ async def echoserver(websocket): # server
         
     @peerConnection.on("connectionstatechange")
     async def disconnect():
-        if peerConnection.connectionState == ("failed", "disconnected", "closed"):
+        if peerConnection.connectionState in ("failed", "disconnected", "closed"):
             await peerConnection.close()
 
     @peerConnection.on('icecandidate')
@@ -151,7 +172,7 @@ async def echoserver(websocket): # server
             }}))
 
             await websocket.send(json.dumps({
-                'type': 'rep_count'
+                'type': 'rep_count',
                 'value': counter
             }))
 
@@ -191,5 +212,3 @@ async def main():
 
 if __name__ == "__main__": 
     asyncio.run(main())
-
-
