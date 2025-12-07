@@ -104,58 +104,59 @@ class _CalorieState extends State<Calorie> {
                   color: Color(0xFF3A3E42),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Color(0xFF715DC8), width: 3)),
-              child: Row(
-                children: [
-                  const Text(
-                    " - ⚡ Calories: 566 cal \n - 🍚 Carbs: 33 g \n - 🥩 Protein: 55 g \n - 🧈 Fats : 13 g ",
-                    style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: Colors.white),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  SizedBox(
-                      width: 150,
-                      height: 150,
-                      child: PieChart(PieChartData(sections: [
-                        // 1 fillet of salmon: 290-310 calories, 44g of protein, and 16-25g of fat
-                        PieChartSectionData(
-                            value: 33,
-                            color: Color(0xFFA22CFF),
-                            title: "Carbohydrates",
-                            titleStyle: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 10,
-                                color: Colors.white)),
-                        PieChartSectionData(
-                            value: 55,
-                            color: Color(0xFF8C52FF),
-                            title: "Protein",
-                            titleStyle: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 10,
-                                color: Colors.white)),
-                        PieChartSectionData(
-                            value: 13,
-                            color: Color(0xFFD7BFFF),
-                            title: "Fats",
-                            titleStyle: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 10,
-                                color: Colors.white))
-                      ])))
-                ],
-              ),
+              child: salmon_count == null
+                  ? SizedBox()
+                  : Row(
+                      children: [
+                        Text(
+                          " - ⚡ Calories: ${salmon_count! * 350} cal \n - 🥩 Protein: ${salmon_count! * 35} g \n - 🧈 Fats : ${salmon_count! * 15} g ",
+                          style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        SizedBox(
+                            width: 150,
+                            height: 150,
+                            child: PieChart(PieChartData(sections: [
+                              PieChartSectionData(
+                                  value: salmon_count! * 350,
+                                  color: Color(0xFFA22CFF),
+                                  title: "Calories",
+                                  titleStyle: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      color: Colors.white)),
+                              PieChartSectionData(
+                                  value: salmon_count! * 35,
+                                  color: Color(0xFF8C52FF),
+                                  title: "Protein",
+                                  titleStyle: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      color: Colors.white)),
+                              PieChartSectionData(
+                                  value: salmon_count! * 15,
+                                  color: Color(0xFFD7BFFF),
+                                  title: "Fats",
+                                  titleStyle: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      color: Colors.white))
+                            ])))
+                      ],
+                    ),
             ),
             const SizedBox(
               height: 15,

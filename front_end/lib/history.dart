@@ -75,9 +75,11 @@ class _HistoryState extends State<History> {
             //   ]
             // )),
             ElevatedButton(
-                onPressed: () {
-                  workout_history.add(now);
-                  store_history();
+                onPressed: () async{
+                  setState(() {
+                    workout_history.add(now);
+                  });
+                  await store_history();
                 },
                 child: Text("add a date")),
             Expanded(

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:cs_ia_gym_app/page_nav.dart';
 import 'package:cs_ia_gym_app/template.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,6 +55,20 @@ class ChestEdit extends StatefulWidget {
   State<ChestEdit> createState() => _ChestEditState();
 }
 
+Future<void> save_template(Workout w) async {
+  //Workout w here is an parameter (input)
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString("workout_Template", jsonEncode(w.toMap()));
+}
+
+Future<Workout?> load_template() async {
+  // Workout w here is an ouput
+  final prefs = await SharedPreferences.getInstance();
+  final rawjson = prefs.getString("workout_Template");
+  if (rawjson == null) return null;
+  return Workout.fromMap(jsonDecode(rawjson));
+}
+
 class _ChestEditState extends State<ChestEdit> {
   // Workout ? workout;
 
@@ -100,20 +114,6 @@ class _ChestEditState extends State<ChestEdit> {
         workout = loaded;
       });
     }
-  }
-
-  Future<void> save_template(Workout w) async {
-    //Workout w here is an parameter (input)
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("workout_Template", jsonEncode(w.toMap()));
-  }
-
-  Future<Workout?> load_template() async {
-    // Workout w here is an ouput
-    final prefs = await SharedPreferences.getInstance();
-    final rawjson = prefs.getString("workout_Template");
-    if (rawjson == null) return null;
-    return Workout.fromMap(jsonDecode(rawjson));
   }
 
   @override
@@ -286,9 +286,11 @@ class _ChestEditState extends State<ChestEdit> {
                               alignment: Alignment.center,
                               child: OutlinedButton(
                                   onPressed: () async {
-                                    excercise.sets
-                                        .add(Sets(weight: 0, reps: 0));
-                                    save_template(workout);
+                                    setState(() {
+                                      excercise.sets
+                                          .add(Sets(weight: 0, reps: 0));
+                                    });
+                                    await save_template(workout);
                                   },
                                   style: OutlinedButton.styleFrom(
                                       foregroundColor: Colors.white,
@@ -307,17 +309,21 @@ class _ChestEditState extends State<ChestEdit> {
                   )),
             const Spacer(),
             TextButton(
-                onPressed: () {
-                  workout.excercises.add(Excercise(
-                      excerciseName: "New Excercise",
-                      sets: [Sets(weight: 0, reps: 0)]));
-                  save_template(workout);
+                onPressed: () async {
+                  setState(() {
+                    workout.excercises.add(Excercise(
+                        excerciseName: "New Excercise",
+                        sets: [Sets(weight: 0, reps: 0)]));
+                  });
+                  await save_template(workout);
                 },
                 style: TextButton.styleFrom(),
                 child: Text("ADD EXCERCISE")),
             OutlinedButton(
                 onPressed: () async {
-                  if (workout != null) save_template(workout!);
+                  setState(() {
+                    if (workout != null) save_template(workout!);
+                  });
                 },
                 style: OutlinedButton.styleFrom(
                     backgroundColor: Color(0xFFD7BFFF)),
