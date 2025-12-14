@@ -83,7 +83,7 @@ class _RepChestState extends State<RepChest> {
     });
 
     setState(() {
-      localRenderer.srcObject = localmediaStream;
+      localRenderer.srcObject = localmediaStream; //.srcObject: video source for RTCVideoRenderer
       print("local render working");
     });
   }
@@ -119,7 +119,7 @@ class _RepChestState extends State<RepChest> {
     } // attach local tracks
 
     peerConnection!.onTrack = (RTCTrackEvent e) {
-      //get video back from python/ RTCTrackEvent: data obj includes (tracks, streams, transceivers)
+      //get video back from python / RTCTrackEvent: data obj includes (tracks, streams, transceivers)
       if (e.streams.isNotEmpty) {
         setState(() => remoteRenderer.srcObject =
             e.streams[0]); // connects remote video to your flutter UI

@@ -28,14 +28,14 @@ class _HistoryState extends State<History> {
     List<String> to_string = workout_history
         .map((i) => i.toIso8601String())
         .toList(); //.map runs through the list and applies a function on each element, =>: returns an expression
-    await prefs.setStringList('key', to_string);
+    await prefs.setStringList('history', to_string);
   }
 
   Future<void> load_history() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> get_key = prefs.getStringList('key') ?? [];
+    List<String> get_history = prefs.getStringList('history') ?? [];
     setState(() {
-      workout_history = get_key.map((i) => DateTime.parse(i)).toList();
+      workout_history = get_history.map((i) => DateTime.parse(i)).toList();
     });
   }
 

@@ -11,12 +11,11 @@ model = YOLO("best.pt")
 print("model loaded")
 model.eval() #sets it to inference mode
 
-@server.post("/detect") #tells fastapi all http post will be handled by this function
+@server.post("/detect") # Whenever someone sends a POST request to /detect, FastAPI will run detect() function.
 async def detect(file: UploadFile = File(...)): # file: python expects a file to be uploaded in the "file" field, UploadFile: fastapi's file handling class, File(...): the input parameter should be from a file upload
     img_bytes = await file.read()
     print(f"{img_bytes}")
     img_PIL = Image.open(io.BytesIO(img_bytes)).convert("RGB") #rgb so YOLO can process
-    # buffer = io.BytesIO() # bytesio creates an in-memory buffer -> stores processed image in memory so it can be returned
 
     result = model(img_PIL)
     first_result = result[0]
@@ -34,9 +33,6 @@ async def detect(file: UploadFile = File(...)): # file: python expects a file to
             obj_count += 1
     print('response should have been sent')
     return JSONResponse({"salmon_count": obj_count})
-
-    # img_PIL.save(buffer, format="JPEG") #saves the image
-    # return Response(content=buffer.getvalue(), media_type = "image/jpeg", ) #first input returns JPEG bytes, second tells flutter that the response is an image
 
 if __name__ == "__main__":
     print("server is now working")

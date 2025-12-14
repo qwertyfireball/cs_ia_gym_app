@@ -106,7 +106,7 @@ class ProcessedVideoTrack(MediaStreamTrack): # class allows store incoming track
         result = self.pose.process(cv2.cvtColor(pose_input, cv2.COLOR_BGR2RGB)) #pose.process only takes in numpy not framepy, which is why need: framepy -> numpy -> frampy (output)
 
         if result.pose_landmarks is None:
-            print("no landmark is drawn, you about to fail chigga")
+            print("no landmark is drawn")
         
         else:
             # place functions here ->
@@ -153,7 +153,7 @@ async def echoserver(websocket): # server
     def onTrack(track):
         if track.kind == "video":
             processed = ProcessedVideoTrack(track)
-            peerConnection.addTrack(processed)
+            peerConnection.addTrack(processed) # adds processed track to the peerconnection
         
     @peerConnection.on("connectionstatechange")
     async def disconnect():
@@ -187,17 +187,18 @@ async def echoserver(websocket): # server
                 answer = await peerConnection.createAnswer()
                 await peerConnection.setLocalDescription(answer) # what python wants to recieve
                 
-                await ice(peerConnection) # Wait for ICE gathering so SDP contains all candidates
+                await ice(peerConnection) # Wait for ICE gathering so SDP contains ICE candidates
 
                 payload = {"type": peerConnection.localDescription.type, "sdp": peerConnection.localDescription.sdp}
                 await websocket.send(json.dumps(payload)) # send sdp answer back
             elif message.get('type') == "candidate":
                 c = message.get('candidate')
-                if c and 'candidate' in c:
+                if c and 'candidate' in c: # checks if c is none and contains candidate key (raw SDP ICE string)
                     candidate = candidate_from_sdp(c['candidate'])
                     candidate.sdpMid = c.get("sdpMid") 
                     candidate.sdpMLineIndex = c.get("sdpMLineIndex")
                     await peerConnection.addIceCandidate(candidate)
+            # trickle ICE candidates
 
 
             elif message.get("type") in ("bye", "close"):

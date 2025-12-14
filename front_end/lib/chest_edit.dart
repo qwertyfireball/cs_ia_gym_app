@@ -23,7 +23,7 @@ class Excercise {
 
   Map<String, dynamic> toMap() => {
         'excercisename': excerciseName,
-        'sets': sets.map((s) => s.toMap()).toList()
+        'sets': sets.map((s) => s.toMap()).toList() // to map loops through each excercise and set to apply the format
       };
   factory Excercise.fromMap(Map<String, dynamic> m) => Excercise(
         excerciseName: m['excercisename'],
