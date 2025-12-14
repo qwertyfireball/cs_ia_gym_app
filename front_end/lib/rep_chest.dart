@@ -246,6 +246,7 @@ class _RepChestState extends State<RepChest> {
               alignment: Alignment.topRight,
               child: TextButton(
                   onPressed: () {
+                    Navigator.pop(context, DateTime.now()); // returns data
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => Rep()));
                   },
